@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Workouts - Fitness Hub{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">My Workouts</h1>
+
+    <!-- Active Workouts -->
+    <section class="mb-5">
+        <h2 class="h3 mb-4">Active Workouts</h2>
+        <div class="row g-4">
+            {% for progress in active_workouts %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    {% if progress.workout.image %}
+                        <img src="{{ progress.workout.image.url }}" class="card-img-top" alt="{{ progress.workout.title }}">
+                    {% else %}
+                        <img src="{% static 'images/workout-placeholder.jpg' %}" class="card-img-top" alt="{{ progress.workout.title }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ progress.workout.title }}</h5>
+                        <div class="progress mb-3">
+                            <div class="progress-bar" role="progressbar" 
+                                 style="width: {{ progress.progress_percentage }}%"
+                                 aria-valuenow="{{ progress.progress_percentage }}" 
+                                 aria-valuemin="0" aria-valuemax="100">
+                                {{ progress.progress_percentage }}%
+                            </div>
+                        </div>
+                        <p class="text-muted mb-3">
+                            Week {{ progress.completed_weeks }} of {{ progress.workout.duration_weeks }}
+                        </p>
+                        <a href="{% url 'workout_progress' progress.workout.slug %}" 
+                           class="btn btn-primary w-100">Continue Workout</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    You don't have any active workouts. 
+                    <a href="{% url 'workout_plans' %}">Browse workout plans</a> to get started!
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Paused Workouts -->
+    {% if paused_workouts %}
+    <section class="mb-5">
+        <h2 class="h3 mb-4">Paused Workouts</h2>
+        <div class="row g-4">
+            {% for progress in paused_workouts %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    {% if progress.workout.image %}
+                        <img src="{{ progress.workout.image.url }}" class="card-img-top" alt="{{ progress.workout.title }}">
+                    {% else %}
+                        <img src="{% static 'images/workout-placeholder.jpg' %}" class="card-img-top" alt="{{ progress.workout.title }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ progress.workout.title }}</h5>
+                        <div class="progress mb-3">
+                            <div class="progress-bar bg-warning" role="progressbar" 
+                                 style="width: {{ progress.progress_percentage }}%"
+                                 aria-valuenow="{{ progress.progress_percentage }}" 
+                                 aria-valuemin="0" aria-valuemax="100">
+                                {{ progress.progress_percentage }}%
+                            </div>
+                        </div>
+                        <p class="text-muted mb-3">
+                            Week {{ progress.completed_weeks }} of {{ progress.workout.duration_weeks }}
+                        </p>
+                        <a href="{% url 'workout_progress' progress.workout.slug %}" 
+                           class="btn btn-warning w-100">Resume Workout</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Completed Workouts -->
+    {% if completed_workouts %}
+    <section>
+        <h2 class="h3 mb-4">Completed Workouts</h2>
+        <div class="row g-4">
+            {% for progress in completed_workouts %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    {% if progress.workout.image %}
+                        <img src="{{ progress.workout.image.url }}" class="card-img-top" alt="{{ progress.workout.title }}">
+                    {% else %}
+                        <img src="{% static 'images/workout-placeholder.jpg' %}" class="card-img-top" alt="{{ progress.workout.title }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ progress.workout.title }}</h5>
+                        <div class="progress mb-3">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 100%">
+                                Completed!
+                            </div>
+                        </div>
+                        <p class="text-muted mb-3">
+                            Completed on {{ progress.last_updated|date:"M d, Y" }}
+                        </p>
+                        <a href="{% url 'workout_progress' progress.workout.slug %}" 
+                           class="btn btn-outline-success w-100">View Progress</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %} 

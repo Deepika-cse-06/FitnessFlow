@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ trainer.user.get_full_name }} - Trainer Profile{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Trainer Profile Card -->
+        <div class="col-lg-4 mb-4">
+            <div class="card trainer-profile-card">
+                <div class="card-body text-center">
+                    {% if trainer.user.userprofile.profile_picture %}
+                        <img src="{{ trainer.user.userprofile.profile_picture.url }}" 
+                             class="mb-4" width="200" height="200" 
+                             alt="{{ trainer.user.get_full_name }}">
+                    {% else %}
+                        <img src="{% static 'images/default-trainer.jpg' %}" 
+                             class="mb-4" width="200" height="200" 
+                             alt="{{ trainer.user.get_full_name }}">
+                    {% endif %}
+                    
+                    <h2 class="card-title mb-3">{{ trainer.user.get_full_name }}</h2>
+                    <p class="text-muted mb-4">{{ trainer.specialties }}</p>
+                    
+                    <div class="trainer-stats row mb-4">
+                        <div class="col-6">
+                            <div class="p-3 border rounded">
+                                <h3 class="mb-0">{{ trainer.experience_years }}</h3>
+                                <small class="text-muted">Years Experience</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 border rounded">
+                                <h3 class="mb-0">{{ trainer.clients_count|default:"0" }}</h3>
+                                <small class="text-muted">Active Clients</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if trainer.is_available %}
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'book_session' trainer.pk %}" class="btn btn-primary btn-lg">
+                            Book a Session
+                        </a>
+                        <button class="btn btn-outline-primary">
+                            Contact Trainer
+                        </button>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        This trainer is currently not available for new sessions.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Trainer Details -->
+        <div class="col-lg-8">
+            <!-- About Section -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">About Me</h3>
+                    <p class="card-text">{{ trainer.bio }}</p>
+                    
+                    <h4 class="mt-4 mb-3">Specialties</h4>
+                    <div class="mb-4">
+                        {% for specialty in trainer.specialties.split %}
+                        <span class="badge bg-primary me-2 mb-2">{{ specialty }}</span>
+                        {% endfor %}
+                    </div>
+                    
+                    <h4 class="mb-3">Certifications</h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-certificate text-primary me-2"></i> Certified Personal Trainer (CPT)</li>
+                        <li class="mb-2"><i class="fas fa-certificate text-primary me-2"></i> Nutrition Specialist</li>
+                        <li class="mb-2"><i class="fas fa-certificate text-primary me-2"></i> First Aid & CPR Certified</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Schedule -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">Available Time Slots</h3>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Day</th>
+                                    <th>Morning</th>
+                                    <th>Afternoon</th>
+                                    <th>Evening</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Monday</td>
+                                    <td class="text-success">Available</td>
+                                    <td class="text-danger">Booked</td>
+                                    <td class="text-success">Available</td>
+                                </tr>
+                                <tr>
+                                    <td>Wednesday</td>
+                                    <td class="text-success">Available</td>
+                                    <td class="text-success">Available</td>
+                                    <td class="text-danger">Booked</td>
+                                </tr>
+                                <tr>
+                                    <td>Friday</td>
+                                    <td class="text-danger">Booked</td>
+                                    <td class="text-success">Available</td>
+                                    <td class="text-success">Available</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reviews -->
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">Client Reviews</h3>
+                    <div class="reviews">
+                        <!-- Sample reviews - replace with actual reviews from database -->
+                        <div class="review mb-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <img src="{% static 'images/default-profile.jpg' %}" class="rounded-circle me-2" width="40" height="40">
+                                <div>
+                                    <h6 class="mb-0">John Doe</h6>
+                                    <div class="text-warning">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="mb-0">Amazing trainer! Really helped me achieve my fitness goals.</p>
+                        </div>
+                        
+                        <div class="review">
+                            <div class="d-flex align-items-center mb-2">
+                                <img src="{% static 'images/default-profile.jpg' %}" class="rounded-circle me-2" width="40" height="40">
+                                <div>
+                                    <h6 class="mb-0">Jane Smith</h6>
+                                    <div class="text-warning">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="mb-0">Very knowledgeable and professional. Highly recommend!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Booking Modal -->
+<div class="modal fade" id="bookingModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Book a Session with {{ trainer.user.get_full_name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Select Date</label>
+                        <input type="date" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Select Time</label>
+                        <select class="form-select">
+                            <option>9:00 AM</option>
+                            <option>10:00 AM</option>
+                            <option>11:00 AM</option>
+                            <option>2:00 PM</option>
+                            <option>3:00 PM</option>
+                            <option>4:00 PM</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Session Type</label>
+                        <select class="form-select">
+                            <option>Personal Training</option>
+                            <option>Group Session</option>
+                            <option>Consultation</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-control" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Book Session</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.trainer-profile-card {
+    border: none;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.trainer-profile-card img {
+    object-fit: cover;
+    width: 100%;
+    height: auto;
+    max-width: 200px;
+    margin: 0 auto;
+    display: block;
+}
+
+.review {
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 1rem;
+}
+
+.review:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+</style>
+{% endblock %} 

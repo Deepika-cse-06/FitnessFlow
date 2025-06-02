@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ workout.title }} Progress - Deepfits{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Workout Info -->
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">{{ workout.title }}</h3>
+                    <div class="d-flex gap-2 mb-3">
+                        <span class="badge bg-primary">{{ workout.difficulty_level }}</span>
+                        <span class="badge bg-secondary">{{ workout.duration_weeks }} weeks</span>
+                    </div>
+                    <p class="card-text">{{ workout.description }}</p>
+                    
+                    <!-- Progress Overview -->
+                    <div class="progress mb-3" style="height: 25px;">
+                        <div class="progress-bar" role="progressbar" 
+                             style="width: {{ progress.progress_percentage }}%"
+                             aria-valuenow="{{ progress.progress_percentage }}" 
+                             aria-valuemin="0" aria-valuemax="100">
+                            {{ progress.progress_percentage }}%
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Week {{ progress.completed_weeks }} of {{ workout.duration_weeks }}</span>
+                        <span class="badge {% if progress.status == 'in_progress' %}bg-success{% elif progress.status == 'paused' %}bg-warning{% else %}bg-info{% endif %}">
+                            {{ progress.status|title }}
+                        </span>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <form method="post" class="d-grid gap-2">
+                        {% csrf_token %}
+                        {% if progress.status == 'in_progress' %}
+                            <button type="submit" name="action" value="complete_week" 
+                                    class="btn btn-success" 
+                                    {% if progress.completed_weeks >= workout.duration_weeks %}disabled{% endif %}>
+                                Complete Week {{ progress.completed_weeks|add:"1" }}
+                            </button>
+                            <button type="submit" name="action" value="pause" class="btn btn-warning">
+                                Pause Workout
+                            </button>
+                        {% elif progress.status == 'paused' %}
+                            <button type="submit" name="action" value="resume" class="btn btn-primary">
+                                Resume Workout
+                            </button>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+
+            <!-- Start Date Info -->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Workout Details</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            Started: {{ progress.start_date|date:"M d, Y" }}
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-clock me-2"></i>
+                            Last Updated: {{ progress.last_updated|date:"M d, Y" }}
+                        </li>
+                        <li>
+                            <i class="fas fa-dumbbell me-2"></i>
+                            Category: {{ workout.category.name }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly Progress -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Weekly Progress</h4>
+                    <div class="row">
+                        {% for week in workout.duration_weeks|rjust:workout.duration_weeks %}
+                            <div class="col-md-3 mb-4">
+                                <div class="card {% if forloop.counter <= progress.completed_weeks %}bg-success text-white{% else %}bg-light{% endif %}">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title mb-0">Week {{ forloop.counter }}</h5>
+                                        {% if forloop.counter <= progress.completed_weeks %}
+                                            <i class="fas fa-check-circle fa-2x mt-2"></i>
+                                        {% else %}
+                                            <i class="fas fa-circle fa-2x mt-2 text-muted"></i>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Notes Section -->
+                    <div class="mt-4">
+                        <h5>Progress Notes</h5>
+                        <form method="post" class="mb-3">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <textarea class="form-control" name="notes" rows="3" 
+                                          placeholder="Add notes about your progress...">{{ progress.notes }}</textarea>
+                            </div>
+                            <button type="submit" name="action" value="update_notes" class="btn btn-primary">
+                                Save Notes
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

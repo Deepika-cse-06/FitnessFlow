@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}My Profile - Deepfits{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Profile Card -->
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    {% if user.userprofile.profile_picture %}
+                        <img src="{{ user.userprofile.profile_picture.url }}" 
+                             class="rounded-circle mb-3" width="150" height="150" 
+                             alt="{{ user.get_full_name }}">
+                    {% else %}
+                        <img src="{% static 'images/default-profile.jpg' %}" 
+                             class="rounded-circle mb-3" width="150" height="150" 
+                             alt="{{ user.get_full_name }}">
+                    {% endif %}
+                    <h4 class="mb-1">{{ user.get_full_name }}</h4>
+                    <p class="text-muted mb-3">Member since {{ user.date_joined|date:"F Y" }}</p>
+                </div>
+            </div>
+
+            <!-- Stats Card -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Your Stats</h5>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h3 class="mb-1">{{ workouts_completed }}</h3>
+                            <small class="text-muted">Workouts Completed</small>
+                        </div>
+                        <div class="col-6">
+                            <h3 class="mb-1">{{ hours_trained }}</h3>
+                            <small class="text-muted">Training Hours</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Sessions -->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Upcoming Sessions</h5>
+                    {% if upcoming_sessions %}
+                        {% for session in upcoming_sessions %}
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0">{{ session.get_session_type_display }}</h6>
+                                <small class="text-muted">
+                                    {{ session.session_date|date:"M d, Y" }} - 
+                                    {{ session.get_session_time_display }}
+                                </small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        <a href="{% url 'my_sessions' %}" class="btn btn-outline-primary btn-sm w-100">View All Sessions</a>
+                    {% else %}
+                        <p class="text-muted mb-0">No upcoming sessions</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Settings -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Profile Settings</h4>
+                    
+                    {% if messages %}
+                    <div class="messages mb-4">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.first_name|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.last_name|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            {{ form.email|as_crispy_field }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.bio|as_crispy_field }}
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.date_of_birth|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.fitness_level|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            {{ form.profile_picture|as_crispy_field }}
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.rounded-circle {
+    object-fit: cover;
+}
+</style>
+{% endblock %} 

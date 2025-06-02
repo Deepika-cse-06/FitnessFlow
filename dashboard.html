@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Deepfits{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-3">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    {% if user.userprofile.profile_picture %}
+                        <img src="{{ user.userprofile.profile_picture.url }}" class="rounded-circle mb-3" width="120" height="120" alt="{{ user.get_full_name }}">
+                    {% else %}
+                        <img src="{% static 'images/default-profile.jpg' %}" class="rounded-circle mb-3" width="120" height="120" alt="{{ user.get_full_name }}">
+                    {% endif %}
+                    <h5 class="mb-1">{{ user.get_full_name }}</h5>
+                    <p class="text-muted mb-3">Member since {{ user.date_joined|date:"F Y" }}</p>
+                    <a href="{% url 'profile' %}" class="btn btn-outline-primary btn-sm">Edit Profile</a>
+                </div>
+            </div>
+
+            <div class="list-group mb-4">
+                <a href="#overview" class="list-group-item list-group-item-action active">Overview</a>
+                <a href="{% url 'my_workouts' %}" class="list-group-item list-group-item-action">My Workouts</a>
+                <a href="#progress" class="list-group-item list-group-item-action">Progress Tracking</a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <!-- Overview Section -->
+            <section id="overview" class="mb-5">
+                <h2 class="mb-4">Overview</h2>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="card text-center h-100">
+                            <div class="card-body">
+                                <i class="fas fa-dumbbell fa-2x text-primary mb-3"></i>
+                                <h5>Active Workouts</h5>
+                                <h3 class="mb-0">{{ active_workouts_count }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-center h-100">
+                            <div class="card-body">
+                                <i class="fas fa-calendar-check fa-2x text-success mb-3"></i>
+                                <h5>Completed Workouts</h5>
+                                <h3 class="mb-0">{{ completed_workouts_count }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-center h-100">
+                            <div class="card-body">
+                                <i class="fas fa-clock fa-2x text-info mb-3"></i>
+                                <h5>Training Hours</h5>
+                                <h3 class="mb-0">{{ total_training_hours }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Progress Tracking -->
+            <section id="progress" class="mb-5">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="card-title mb-0">Progress Tracking</h2>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-outline-primary active" data-period="week">Week</button>
+                                <button type="button" class="btn btn-outline-primary" data-period="month">Month</button>
+                                <button type="button" class="btn btn-outline-primary" data-period="year">Year</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Progress Chart -->
+                        <div class="chart-container" style="position: relative; height:300px; width:100%">
+                            <canvas id="progressChart"></canvas>
+                        </div>
+
+                        <!-- Recent Workouts -->
+                        <div class="mt-4">
+                            <h5 class="mb-3">Recent Workouts</h5>
+                            {% for workout in recent_workouts %}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">{{ workout.workout.title }}</h6>
+                                            <small class="text-muted">Last updated: {{ workout.last_updated|date:"M d, Y" }}</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="progress" style="width: 150px;">
+                                                <div class="progress-bar {% if workout.status == 'completed' %}bg-success{% endif %}" 
+                                                     role="progressbar" 
+                                                     style="width: {{ workout.progress_percentage }}%">
+                                                    {{ workout.progress_percentage }}%
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="alert alert-info">
+                                No recent workout activity. <a href="{% url 'workout_plans' %}">Start a new workout!</a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('progressChart').getContext('2d');
+        const progressChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ progress_dates|safe }},
+                datasets: [{
+                    label: 'Workout Progress',
+                    data: {{ progress_data|safe }},
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                    tension: 0.1,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: 'Progress (%)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Progress: ${context.parsed.y}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Handle period buttons
+        document.querySelectorAll('[data-period]').forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons
+                document.querySelectorAll('[data-period]').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                // Here you would typically update the chart data based on the selected period
+                // For now, we'll just log the selected period
+                console.log('Selected period:', this.dataset.period);
+            });
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %} 

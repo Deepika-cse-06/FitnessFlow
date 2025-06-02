@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Book Session with {{ trainer.user.get_full_name }} - Deepfits{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        {% if trainer.user.userprofile.profile_picture %}
+                            <img src="{{ trainer.user.userprofile.profile_picture.url }}" 
+                                 class="rounded-circle mb-3" width="100" height="100" 
+                                 alt="{{ trainer.user.get_full_name }}">
+                        {% else %}
+                            <img src="{% static 'images/default-trainer.jpg' %}" 
+                                 class="rounded-circle mb-3" width="100" height="100" 
+                                 alt="{{ trainer.user.get_full_name }}">
+                        {% endif %}
+                        <h2 class="mb-1">Book a Session with {{ trainer.user.get_full_name }}</h2>
+                        <p class="text-muted">{{ trainer.specialties }}</p>
+                    </div>
+
+                    {% if messages %}
+                    <div class="messages mb-4">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        
+                        <div class="alert alert-info mb-4">
+                            <h5 class="alert-heading">Session Information</h5>
+                            <p class="mb-0">
+                                <strong>Personal Training:</strong> One-on-one training tailored to your goals<br>
+                                <strong>Group Session:</strong> Train with others in a motivating environment<br>
+                                <strong>Consultation:</strong> Discuss your fitness goals and create a plan
+                            </p>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Book Session</button>
+                            <a href="{% url 'trainer_detail' trainer.pk %}" class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.alert-info {
+    background-color: #f8f9fa;
+    border-color: #e9ecef;
+    color: #495057;
+}
+</style>
+{% endblock %} 

@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Our Expert Trainers - Deepfits{% endblock %}
+
+{% block extra_css %}
+<style>
+.trainer-section {
+    padding: 4rem 0;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--bs-primary);
+}
+
+.trainer-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+    padding-top: 2rem;
+}
+
+.trainer-card:hover {
+    transform: translateY(-5px);
+}
+
+.trainer-specialties {
+    color: var(--bs-primary);
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.social-links a {
+    color: var(--bs-gray-600);
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+}
+
+.social-links a:hover {
+    color: var(--bs-primary);
+}
+
+.btn-trainer {
+    background-color: var(--bs-primary);
+    color: white;
+    border-radius: 25px;
+    padding: 0.5rem 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-trainer:hover {
+    background-color: var(--bs-primary-dark);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-outline-trainer {
+    border: 2px solid var(--bs-primary);
+    color: var(--bs-primary);
+    border-radius: 25px;
+    padding: 0.5rem 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-trainer:hover {
+    background-color: var(--bs-primary);
+    color: white;
+}
+
+.trainer-meta .badge {
+    margin: 0.2rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="trainer-section">
+    <div class="section-header">
+        <h1>Our Expert Trainers</h1>
+        <p>Meet our certified fitness professionals ready to guide you on your fitness journey</p>
+    </div>
+
+    <!-- Trainer Stats -->
+    <div class="stats-container trainer-stats">
+        <div class="stat-card">
+            <div class="stat-number">{{ trainers.count }}</div>
+            <div class="stat-label">Expert Trainers</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_sessions }}</div>
+            <div class="stat-label">Sessions Completed</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_clients }}</div>
+            <div class="stat-label">Happy Clients</div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-section">
+        <div class="row">
+            <div class="col-md-4">
+                <select class="form-control" id="specialization">
+                    <option value="">All Specializations</option>
+                    <option value="strength">Strength Training</option>
+                    <option value="cardio">Cardio & HIIT</option>
+                    <option value="yoga">Yoga & Flexibility</option>
+                    <option value="sports">Sports Conditioning</option>
+                    <option value="bodybuilding">Bodybuilding</option>
+                    <option value="senior">Senior Fitness</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select class="form-control" id="experience">
+                    <option value="">All Experience Levels</option>
+                    <option value="5">5+ Years</option>
+                    <option value="10">10+ Years</option>
+                    <option value="15">15+ Years</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select class="form-control" id="availability">
+                    <option value="">All Availability</option>
+                    <option value="morning">Morning</option>
+                    <option value="afternoon">Afternoon</option>
+                    <option value="evening">Evening</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trainers Grid -->
+    <div class="row g-4">
+        {% for trainer in trainers %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card trainer-card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ trainer.user.get_full_name }}</h5>
+                    <p class="trainer-specialties">{{ trainer.specialties }}</p>
+                    <p class="card-text">{{ trainer.bio|truncatewords:30 }}</p>
+                    <div class="trainer-meta mb-3">
+                        <span class="badge bg-primary">{{ trainer.experience_years }}+ Years Experience</span>
+                        <span class="badge bg-secondary">{{ trainer.certification }}</span>
+                    </div>
+                    <div class="social-links mb-3">
+                        {% if trainer.instagram_handle %}
+                        <a href="https://instagram.com/{{ trainer.instagram_handle }}" target="_blank">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        {% endif %}
+                        {% if trainer.twitter_handle %}
+                        <a href="https://twitter.com/{{ trainer.twitter_handle }}" target="_blank">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-top-0 text-center">
+                    <a href="{% url 'trainer_detail' trainer.id %}" class="btn btn-trainer">View Profile</a>
+                    {% if trainer.is_available %}
+                    <a href="{% url 'book_session' trainer.id %}" class="btn btn-outline-trainer mt-2 w-100">Book Session</a>
+                    {% else %}
+                    <button class="btn btn-outline-secondary mt-2 w-100" disabled>Currently Unavailable</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                No trainers available at the moment.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Filter functionality
+    document.querySelectorAll('.form-control').forEach(select => {
+        select.addEventListener('change', function() {
+            // Add filter logic here
+            console.log('Filter changed:', this.value);
+        });
+    });
+</script>
+{% endblock %} 

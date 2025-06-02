@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Blog - Deepfits{% endblock %}
+
+{% block extra_css %}
+<style>
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-title {
+    color: var(--bs-primary);
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.author {
+    display: flex;
+    align-items: center;
+}
+
+.author-name {
+    font-weight: 500;
+    color: var(--bs-gray-700);
+    margin-left: 0.5rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-4">Fitness Blog</h1>
+
+    <div class="row g-4">
+        {% for post in posts %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <small class="text-muted">{{ post.created_at|date:"M d, Y" }}</small>
+                        {% for category in post.categories.all %}
+                            <span class="badge bg-primary">{{ category.name }}</span>
+                        {% endfor %}
+                    </div>
+                    <h5 class="card-title">{{ post.title }}</h5>
+                    <p class="card-text">{{ post.content|truncatewords:30 }}</p>
+                </div>
+                <div class="card-footer bg-transparent border-top-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="author">
+                            <span class="author-name">{{ post.author.get_full_name }}</span>
+                        </div>
+                        <a href="{% url 'blog_detail' post.slug %}" class="btn btn-outline-primary btn-sm">
+                            Read More
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                No blog posts available at the moment.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

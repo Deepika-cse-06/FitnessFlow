@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Contact Us - Deepfits{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="text-center mb-4">Contact Us</h1>
+                    
+                    {% if messages %}
+                    <div class="messages mb-4">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="row mb-4">
+                        <div class="col-md-4 text-center mb-3 mb-md-0">
+                            <i class="fas fa-phone fa-2x text-primary mb-2"></i>
+                            <h5>Phone</h5>
+                            <p class="mb-0">+1 (555) 123-4567</p>
+                        </div>
+                        <div class="col-md-4 text-center mb-3 mb-md-0">
+                            <i class="fas fa-envelope fa-2x text-primary mb-2"></i>
+                            <h5>Email</h5>
+                            <p class="mb-0">info@fitnesshub.com</p>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <i class="fas fa-map-marker-alt fa-2x text-primary mb-2"></i>
+                            <h5>Location</h5>
+                            <p class="mb-0">123 Fitness Street<br>Gym City, GC 12345</p>
+                        </div>
+                    </div>
+
+                    <form method="post" class="contact-form">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">Send Message</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Map Section -->
+            <div class="card shadow-sm mt-4">
+                <div class="card-body">
+                    <h4 class="card-title mb-3">Find Us</h4>
+                    <div class="ratio ratio-16x9">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d387193.30596698663!2d-74.25987368715491!3d40.69714941932609!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c24fa5d33f083b%3A0xc80b8f06e177fe62!2sNew%20York%2C%20NY%2C%20USA!5e0!3m2!1sen!2s!4v1647043376548!5m2!1sen!2s"
+                            style="border:0;" 
+                            allowfullscreen="" 
+                            loading="lazy">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Workout Plans - Deepfits{% endblock %}
+
+{% block content %}
+<div class="workout-section">
+    <div class="section-header">
+        <h1>Workout Plans</h1>
+        <p>Choose from our carefully designed workout plans to achieve your fitness goals</p>
+    </div>
+
+    <!-- Workout Stats -->
+    <div class="stats-container workout-stats">
+        <div class="stat-card">
+            <div class="stat-number">{{ workout_plans.count }}</div>
+            <div class="stat-label">Available Plans</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_users_working_out }}</div>
+            <div class="stat-label">Active Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ completed_workouts }}</div>
+            <div class="stat-label">Completed Workouts</div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-section">
+        <div class="row">
+            <div class="col-md-4">
+                <select class="form-control" id="difficulty">
+                    <option value="">All Difficulty Levels</option>
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select class="form-control" id="category">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                    <option value="{{ category.slug }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select class="form-control" id="duration">
+                    <option value="">All Durations</option>
+                    <option value="4">4 Weeks</option>
+                    <option value="8">8 Weeks</option>
+                    <option value="12">12 Weeks</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Workout Plans Grid -->
+    <div class="row g-4">
+        {% for plan in workout_plans %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card workout-card h-100">
+                {% if plan.image %}
+                <img src="{{ plan.image.url }}" class="card-img-top" alt="{{ plan.title }}">
+                {% else %}
+                <img src="{% static 'images/workout-placeholder.jpg' %}" class="card-img-top" alt="{{ plan.title }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ plan.title }}</h5>
+                    <p class="card-text">{{ plan.description|truncatewords:20 }}</p>
+                    <div class="workout-meta">
+                        <span class="badge bg-primary">{{ plan.get_difficulty_level_display }}</span>
+                        <span class="badge bg-secondary">{{ plan.duration_weeks }} Weeks</span>
+                        <span class="badge bg-info">{{ plan.category.name }}</span>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-top-0">
+                    <a href="{% url 'workout_detail' plan.slug %}" class="btn btn-workout w-100">View Plan</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                No workout plans available at the moment.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Filter functionality
+    document.querySelectorAll('.form-control').forEach(select => {
+        select.addEventListener('change', function() {
+            // Add filter logic here
+            console.log('Filter changed:', this.value);
+        });
+    });
+</script>
+{% endblock %} 

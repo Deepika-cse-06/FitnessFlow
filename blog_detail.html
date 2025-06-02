@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ post.title }} - Fitness Hub{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <article class="blog-post">
+                <!-- Post Header -->
+                <header class="mb-4">
+                    <h1 class="display-4 mb-3">{{ post.title }}</h1>
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="author me-4">
+                            {% if post.author.userprofile.profile_picture %}
+                                <img src="{{ post.author.userprofile.profile_picture.url }}" 
+                                     class="rounded-circle me-2" width="40" height="40" 
+                                     alt="{{ post.author.get_full_name }}">
+                            {% endif %}
+                            <span>{{ post.author.get_full_name }}</span>
+                        </div>
+                        <div class="post-meta">
+                            <small class="text-muted me-3">
+                                <i class="fas fa-calendar-alt me-1"></i>
+                                {{ post.created_at|date:"F d, Y" }}
+                            </small>
+                            {% for category in post.categories.all %}
+                                <span class="badge bg-secondary me-1">{{ category.name }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Post Image -->
+                {% if post.image %}
+                    <div class="blog-post-image mb-4">
+                        <img src="{{ post.image.url }}" class="img-fluid rounded" alt="{{ post.title }}">
+                    </div>
+                {% endif %}
+
+                <!-- Post Content -->
+                <div class="blog-post-content">
+                    {{ post.content|linebreaks }}
+                </div>
+
+                <!-- Post Footer -->
+                <footer class="blog-post-footer mt-5 pt-4 border-top">
+                    <div class="row align-items-center">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <h5>Share this post</h5>
+                            <div class="social-share">
+                                <a href="#" class="btn btn-outline-primary me-2">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                                <a href="#" class="btn btn-outline-info me-2">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" class="btn btn-outline-success">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <a href="{% url 'blog_list' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Back to Blog
+                            </a>
+                        </div>
+                    </div>
+                </footer>
+            </article>
+        </div>
+    </div>
+</div>
+{% endblock %} 

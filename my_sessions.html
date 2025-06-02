@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Training Sessions - Fitness Hub{% endblock %}
+
+{% block content %}
+<div class="session-section">
+    <div class="section-header">
+        <h1>My Training Sessions</h1>
+        <p>Manage your scheduled training sessions and view session history</p>
+    </div>
+
+    <!-- Session Stats -->
+    <div class="stats-container session-stats">
+        <div class="stat-card">
+            <div class="stat-number">{{ upcoming_sessions.count }}</div>
+            <div class="stat-label">Upcoming Sessions</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ past_sessions.count }}</div>
+            <div class="stat-label">Completed Sessions</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_hours }}</div>
+            <div class="stat-label">Total Training Hours</div>
+        </div>
+    </div>
+
+    <!-- Upcoming Sessions -->
+    <div class="mb-5">
+        <h2 class="mb-4">Upcoming Sessions</h2>
+        <div class="row g-4">
+            {% for session in upcoming_sessions %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card session-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Session with {{ session.trainer.user.get_full_name }}</h5>
+                        <div class="session-meta mb-3">
+                            <p><i class="far fa-calendar"></i> {{ session.session_date }}</p>
+                            <p><i class="far fa-clock"></i> {{ session.session_time }}</p>
+                            <p><i class="fas fa-dumbbell"></i> {{ session.session_type }}</p>
+                        </div>
+                        <div class="trainer-info mb-3">
+                            <img src="{% if session.trainer.profile_picture %}{{ session.trainer.profile_picture.url }}{% else %}{% static 'images/default-trainer.jpg' %}{% endif %}" 
+                                 class="trainer-thumbnail" alt="{{ session.trainer.user.get_full_name }}">
+                            <div>
+                                <p class="trainer-specialties">{{ session.trainer.specialties }}</p>
+                            </div>
+                        </div>
+                        <div class="session-status">
+                            <span class="badge bg-success">{{ session.get_status_display }}</span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0">
+                        {% if session.status == 'scheduled' %}
+                        <button class="btn btn-outline-danger w-100" onclick="cancelSession({{ session.id }})">Cancel Session</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No upcoming sessions scheduled. <a href="{% url 'trainer_list' %}" class="alert-link">Book a session with our trainers</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Past Sessions -->
+    <div class="mb-5">
+        <h2 class="mb-4">Past Sessions</h2>
+        <div class="row g-4">
+            {% for session in past_sessions %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card session-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Session with {{ session.trainer.user.get_full_name }}</h5>
+                        <div class="session-meta mb-3">
+                            <p><i class="far fa-calendar"></i> {{ session.session_date }}</p>
+                            <p><i class="far fa-clock"></i> {{ session.session_time }}</p>
+                            <p><i class="fas fa-dumbbell"></i> {{ session.session_type }}</p>
+                        </div>
+                        <div class="trainer-info mb-3">
+                            <img src="{% if session.trainer.profile_picture %}{{ session.trainer.profile_picture.url }}{% else %}{% static 'images/default-trainer.jpg' %}{% endif %}" 
+                                 class="trainer-thumbnail" alt="{{ session.trainer.user.get_full_name }}">
+                            <div>
+                                <p class="trainer-specialties">{{ session.trainer.specialties }}</p>
+                            </div>
+                        </div>
+                        <div class="session-status">
+                            <span class="badge {% if session.status == 'completed' %}bg-success{% else %}bg-secondary{% endif %}">
+                                {{ session.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No past sessions found.
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Cancelled Sessions -->
+    {% if cancelled_sessions %}
+    <div>
+        <h2 class="mb-4">Cancelled Sessions</h2>
+        <div class="row g-4">
+            {% for session in cancelled_sessions %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card session-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Session with {{ session.trainer.user.get_full_name }}</h5>
+                        <div class="session-meta mb-3">
+                            <p><i class="far fa-calendar"></i> {{ session.session_date }}</p>
+                            <p><i class="far fa-clock"></i> {{ session.session_time }}</p>
+                            <p><i class="fas fa-dumbbell"></i> {{ session.session_type }}</p>
+                        </div>
+                        <div class="trainer-info mb-3">
+                            <img src="{% if session.trainer.profile_picture %}{{ session.trainer.profile_picture.url }}{% else %}{% static 'images/default-trainer.jpg' %}{% endif %}" 
+                                 class="trainer-thumbnail" alt="{{ session.trainer.user.get_full_name }}">
+                            <div>
+                                <p class="trainer-specialties">{{ session.trainer.specialties }}</p>
+                            </div>
+                        </div>
+                        <div class="session-status">
+                            <span class="badge bg-danger">{{ session.get_status_display }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function cancelSession(sessionId) {
+    if (confirm('Are you sure you want to cancel this session?')) {
+        // Add AJAX call to cancel session
+        console.log('Cancelling session:', sessionId);
+    }
+}
+</script>
+{% endblock %} 
